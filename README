@@ -1,0 +1,3 @@
+This is a project to display a slideshow of recently tweeted pictures and text on a screen for a festival event.
+
+This is a sinatra ruby app designed to be deployed on the heroku platform.

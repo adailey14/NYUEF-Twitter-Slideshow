@@ -3,10 +3,9 @@ require 'json'
 require 'sinatra'
 require 'haml'
 require 'twitter'
-require 'open-uri'
 
 
-#startup script:
+#Configure Twitter API on startup. This info is Andrew Dailey's and should probably be kept more secret. How?
 Twitter.configure do |config|
   config.consumer_key = "zbRBK4m4Xl7H3tjFTmBmOQ"
   config.consumer_secret = "FyKXvCupasKYjixBa3cDf4uZDTgwltc5x7sQwbeA1w"
@@ -16,19 +15,18 @@ end
 
 #Routes:
 
-
+# serve up the main page, provided in main.haml wrapped in layout.haml
 get '/' do
+  @hash = if params[:hashtag]
+		'#' + params[:hashtag]
+	else
+		"#nyuef"
+	end
   haml :main
 end
 
-def customSearch(client, q)
-	options = {:result_type => "recent"}
-	client.get("/search", options.merge(:q => q))['results'].map do |status|
-      Twitter::Status.new(status)
-    end
-end
 
-
+# serve ajax requests by searching the twitter api and returning any new results
 get '/update/?:lastid?' do
   begin
     # Initialize a Twitter search
@@ -41,8 +39,8 @@ get '/update/?:lastid?' do
 		latestid = 0
 	end
 
-	hash = if params[:hash]
-		params[:hash]
+	hash = if params[:hashtag]
+		params[:hashtag]
 	else
 		"nyuef"
 	end
