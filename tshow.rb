@@ -4,8 +4,6 @@ require 'sinatra'
 require 'haml'
 require 'twitter'
 require 'open-uri'
-require 'hpricot'
-
 
 
 #startup script:
@@ -23,31 +21,50 @@ get '/' do
   haml :main
 end
 
+def customSearch(client, q)
+	options = {:result_type => "recent"}
+	client.get("/search", options.merge(:q => q))['results'].map do |status|
+      Twitter::Status.new(status)
+    end
+end
 
-get '/update' do
+
+get '/update/?:lastid?' do
   begin
     # Initialize a Twitter search
     client = Twitter::Client.new
-    tweets = {}
-    client.search("#nyuef", {:result_type => "recent"}).each do |tweetItem|
+    tweets = []
+
+    if params[:lastid]
+    	latestid = params[:lastid].to_i
+	else
+		latestid = 0
+	end
+
+	hash = if params[:hash]
+		params[:hash]
+	else
+		"nyuef"
+	end
+
+    results = client.search("#"+hash, {:recent_type => "recent", :since_id => (latestid+1), :count => 99})
+
+	puts("Latest ID " + (latestid+1).to_s)
+
+    results.each do |tweetItem|
       tweet = {:text => tweetItem[:text], :urls => []}
-      if (tweetItem[:entities] && mediaItems = tweetItem[:entities][:media])
+      puts("TweetItem ID " + tweetItem[:id].to_s)
+      if (tweetItem[:id] > latestid)
+      	latestid = tweetItem[:id]
+  	  end
+      if (tweetItem[:entities] && (mediaItems = tweetItem[:entities][:media]))
         mediaItems.each do |mediaItem|
           tweet[:urls].push(mediaItem[:media_url] + ":large")
         end
       end
-      tweets[tweetItem[:id]] = tweet
+      tweets.push(tweet)
     end
-    tweets.to_json
-    # f = open("http://t.co/ibyLuOMS")
-    # 
-    # doc = Hpricot.parse(f)
-    # images = []
-    # 
-    # (doc/:div).each do |img|
-    #   images.push(img.attributes)
-    # end
-    # images.to_json
+    {:tweets => tweets.reverse(), :latestid => latestid.to_s}.to_json
   rescue => e
     "Error!" + e.to_s.to_json
   end
