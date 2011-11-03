@@ -1,0 +1,8 @@
+source 'http://rubygems.org'
+gem 'sinatra'
+gem 'thin'
+gem 'haml'
+gem 'bson_ext'
+gem 'json'
+gem 'twitter'
+gem 'hpricot'
