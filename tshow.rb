@@ -47,10 +47,8 @@ get '/update/?:lastid?' do
 
     results = client.search("#"+hash, {:recent_type => "recent", :since_id => (latestid+1), :count => 99})
 
-	puts("Latest ID " + (latestid+1).to_s)
-
     results.each do |tweetItem|
-      tweet = {:text => tweetItem[:text], :urls => []}
+      tweet = {:text => tweetItem[:text], :urls => [], :from_user => tweetItem[:user][:name]}
       puts("TweetItem ID " + tweetItem[:id].to_s)
       if (tweetItem[:id] > latestid)
       	latestid = tweetItem[:id]

@@ -7,6 +7,7 @@ var currentlyPlaying = 0; //index in playOrder of the currently displayed image
 var latestid; //twitter API Id of the most recent tweet recieved (sent back to server)
 var deletePlaying = false;
 var querystring = "";
+var hashtag = "nyuef";
 
 //function to generate unique IDs.
 //There will only be 20 or so IDs out at any one time so we can loop back to 0 eventually
@@ -20,16 +21,24 @@ var getUniqueIndex = function(){
 
 function deleteOldestImage(){
 	var oldestImageIndex = addedOrder.shift();
-	nodesHash[oldestImage].detach();
-	delete nodesHash[oldestImageIndex];	
+	nodesHash[oldestImageIndex].image.detach();
+	delete nodesHash[oldestImageIndex];
 }
 
-function addImage(imageurl) {
+function addImage(imageurl, text, from_user) {
 	//try to load this url as an image
+	
+	var caption;
+	if (text == ""){
+		caption = $('<div></div>');
+	} else {
+		caption = $('<div class="caption">' + from_user + ": " + text + '</div>');
+	}
+	
 	var image = $('<img src="' + imageurl + '">').load(function(){
 		var newUniqueIndex = getUniqueIndex();
 		var newPlaySlot = currentlyPlaying+1;
-		nodesHash[newUniqueIndex] = image;
+		nodesHash[newUniqueIndex] = {image:image, caption:caption};
 		playOrder.splice(newPlaySlot,0,newUniqueIndex);
 		addedOrder.push(newUniqueIndex);
 		
@@ -46,26 +55,32 @@ function addImage(imageurl) {
 	$('#images').append(image);
 }
 
-function addTweet(text) {
-	var newTweet = $("<p style='display:none'>" + text + "</p>");
-	tweetNodes.push(newTweet);
+function addTweet(text, from_user) {
+	if (text !== "") {
+		var newTweet = $("<p style='display:none'>" + from_user + ": " + text + "</p>");
+		tweetNodes.push(newTweet);
 	
-	if(tweetNodes.length > 7) {
-		var oldestTweet = tweetNodes.shift();
-		oldestTweet.fadeOut(function(){oldestTweet.detach();});
-	}
+		if(tweetNodes.length > 7) {
+			var oldestTweet = tweetNodes.shift();
+			oldestTweet.fadeOut(function(){oldestTweet.detach();});
+		}
 
-	$('#tweets').prepend(newTweet);
-	newTweet.slideDown();
+		$('#tweets').prepend(newTweet);
+		newTweet.slideDown();
+	}
 }
 
 
 function processUpdate(json) {
 	latestid = json.latestid;
 	$.each(json.tweets, function(index, value){
-		addTweet(value.text);
+		//remove urls and the hashtag from the tweets
+		value.text = value.text.replace(/ ?(http|ftp|https):\/\/[\w\-_]+(\.[\w\-_]+)+([\w\-\.,@?^=%&amp;:/~\+#]*[\w\-\@?^=%&amp;/~\+#])? ?/g,"");
+		value.text = value.text.replace(new RegExp(" ?#" + hashtag + " ?"),"");
+		
+		addTweet(value.text, value.from_user);
 		$.each(value.urls, function(index, imageurl) {
-			addImage(imageurl);
+			addImage(imageurl, value.text, value.from_user);
 		});
 	});
 	//poll the server again in 20 seconds
@@ -102,11 +117,15 @@ function advanceSlideshow(){
 		}
 		nextNode = nodesHash[playOrder[currentlyPlaying]];
 
-		previousNode.fadeOut(function(){
+		previousNode.caption.fadeOut();
+		previousNode.image.fadeOut(function(){
 			$('#images').append(previousNode);
-			nextNode.hide();
-			$('#mainimage').append(nextNode);
-			nextNode.fadeIn();
+			nextNode.image.hide();
+			$('#mainimage').append(nextNode.image);
+			nextNode.image.fadeIn();
+			nextNode.caption.hide();
+			$('#captionbox').append(nextNode.caption);
+			nextNode.caption.fadeIn();
 		});
 		
 		if(deletePlaying){
@@ -120,8 +139,9 @@ function advanceSlideshow(){
 //start the program by polling the server and running the slideshow
 //these functions will trigger and endless cycle of repolling and slide updates
 $(document).ready(function(){
-	var hashtag = getParameterByName("hashtag");
-	if (hashtag){
+	var inputhashtag = getParameterByName("hashtag");
+	if (inputhashtag){
+		hashtag = inputhashtag;
 		querystring = "?hashtag=" + hashtag;
 	}
 	
