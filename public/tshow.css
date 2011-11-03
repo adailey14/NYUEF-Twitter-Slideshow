@@ -23,7 +23,6 @@ body {
 	padding: 10px;
 	color: white;
    font: 18px Helvetica, Sans-Serif;
-   letter-spacing: -1px;
    background: rgb(0, 0, 0); /* fallback color */
    background: rgba(0, 0, 0, 0.7);
 }
@@ -37,8 +36,7 @@ body {
 .caption {
 	padding: 10px;
 	color: white;
-   font: 16px Helvetica, Sans-Serif;
-   letter-spacing: -1px;
+   font: 20px Helvetica, Sans-Serif;
    background: rgb(0, 0, 0); /* fallback color */
    background: rgba(0, 0, 0, 0.7);
 }
