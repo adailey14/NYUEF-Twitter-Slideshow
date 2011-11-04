@@ -75,8 +75,8 @@ function processUpdate(json) {
 	latestid = json.latestid;
 	$.each(json.tweets, function(index, value){
 		//remove urls and the hashtag from the tweets
-		value.text = value.text.replace(/ ?(http|ftp|https):\/\/[\w\-_]+(\.[\w\-_]+)+([\w\-\.,@?^=%&amp;:/~\+#]*[\w\-\@?^=%&amp;/~\+#])? ?/g,"");
-		value.text = value.text.replace(new RegExp(" ?#" + hashtag + " ?","gi"),"");
+		value.text = value.text.replace(/(http|ftp|https):\/\/[\w\-_]+(\.[\w\-_]+)+([\w\-\.,@?^=%&amp;:/~\+#]*[\w\-\@?^=%&amp;/~\+#])? ?/g,"");
+		// value.text = value.text.replace(new RegExp(" ?#" + hashtag + " ?","gi"),"");
 		
 		addTweet(value.text, value.from_user);
 		$.each(value.urls, function(index, imageurl) {
