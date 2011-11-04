@@ -129,7 +129,7 @@ function advanceSlideshow(){
 		});
 		
 		if(deletePlaying){
-			deleteOldest();
+			deleteOldestImage();
 			deletePlaying = false;
 		}
 	}
