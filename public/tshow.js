@@ -60,7 +60,7 @@ function addTweet(text, from_user) {
 		var newTweet = $("<p style='display:none'>" + from_user + ": " + text + "</p>");
 		tweetNodes.push(newTweet);
 	
-		if(tweetNodes.length > 7) {
+		if(tweetNodes.length > 4) {
 			var oldestTweet = tweetNodes.shift();
 			oldestTweet.fadeOut(function(){oldestTweet.detach();});
 		}

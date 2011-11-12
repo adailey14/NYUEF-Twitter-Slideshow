@@ -32,7 +32,7 @@ canvas {
 .tweets {
 	padding: 10px;
 	color: white;
-   font: 18px Helvetica, Sans-Serif;
+   font: 24px Helvetica, Sans-Serif;
    background: rgb(0, 0, 0); /* fallback color */
    background: rgba(0, 0, 0, 0.6);
 }
