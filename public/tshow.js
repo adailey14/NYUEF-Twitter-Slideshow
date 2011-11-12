@@ -183,7 +183,7 @@ function advanceSlideshow() {
 			deletePlaying = false;
 		}
 	}	
-	setTimeout(advanceSlideshow, 2000);
+	setTimeout(advanceSlideshow, 6000);
 }
 /*
 //remove the current image and replace with the next image
