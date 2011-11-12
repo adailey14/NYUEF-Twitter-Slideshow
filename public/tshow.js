@@ -98,6 +98,94 @@ function pollServer(){
 	}
 }
 
+//drop in the next image
+var imgCtxQueue = new Array();  // keeps track of canvases
+var imgCtxIndex = 0;
+var maxCanvi = 10;
+function advanceSlideshow() {
+	
+	if (imgCtxQueue.length > maxCanvi) {
+		var killCtx = imgCtxQueue.shift();
+		document.body.removeChild(killCtx.canvas);
+	}
+	
+	// max dimensions for images
+	var box = Math.min(window.innerWidth, window.innerHeight);
+	var maxImageWidth = box * .9;
+	var maxImageHeight = box * .9;
+	
+	// positioning area
+	var bleed = .1;
+	var xMin = -(window.innerWidth * bleed);
+	var xMax = window.innerWidth - (window.innerWidth * .2); // allow room for sidebar
+	var yMin = -(window.innerHeight * bleed);
+	var yMax = window.innerHeight;
+	
+	if (playOrder.length > 0) {
+		
+		//move to next image
+		var previousNode = nodesHash[playOrder[currentlyPlaying]];
+		//TODO use %
+		if(currentlyPlaying >= playOrder.length-1) {
+			currentlyPlaying = 0;
+		} else {
+			currentlyPlaying++;
+		}
+		
+		var nextNode;
+		while((playOrder[currentlyPlaying] != undefined) && (nodesHash[playOrder[currentlyPlaying]] == undefined)){
+			playOrder.splice(currentlyPlaying,1);
+			if(currentlyPlaying >= playOrder.length) {
+				currentlyPlaying = 0;
+			}
+		}
+		nextNode = nodesHash[playOrder[currentlyPlaying]];
+		nextImg = nextNode.image.get(0);
+
+		previousNode.caption.fadeOut();
+		
+		// resize image
+		if (nextImg.width > nextImg.height) {
+			nextImg.height = nextImg.height * (maxImageWidth / nextImg.width);
+			nextImg.width = maxImageWidth;
+		} else {
+			nextImg.width = nextImg.width * (maxImageHeight / nextImg.height);
+			nextImg.height = maxImageHeight;
+		}
+		
+		// random image position and tilt
+		var imageX = (Math.random() * ((xMax - nextImg.width) - xMin)) + xMin;
+		var imageY = (Math.random() * ((yMax - nextImg.height) - yMin)) + yMin;
+		var tilt = (Math.random() * .4) - .2; // tilt within + or - .2 radians
+		
+		var imageCtx = document.createElement('canvas').getContext('2d');
+		imageCtx.canvas.width = window.innerWidth;
+		imageCtx.canvas.height = window.innerHeight;
+		imageCtx.save();
+		imageCtx.rotate(tilt);
+		imageCtx.drawImage(nextImg, imageX, imageY, nextImg.width, nextImg.height);
+		imageCtx.restore();
+		
+		$(imageCtx.canvas).hide();
+		imageCtx.canvas.style.backgroundColor = "rgba(0,0,0,0.2)";
+		document.body.appendChild(imageCtx.canvas);
+		$(imageCtx.canvas).fadeIn();
+		
+		// add to queue
+		imgCtxQueue.push(imageCtx);
+		
+		nextNode.caption.hide();
+		$('#captionbox').html(nextNode.caption);
+		nextNode.caption.fadeIn();
+		
+		if(deletePlaying){
+			deleteOldestImage();
+			deletePlaying = false;
+		}
+	}	
+	setTimeout(advanceSlideshow, 2000);
+}
+/*
 //remove the current image and replace with the next image
 //images not being displayed are stored in the #images div
 function advanceSlideshow(){
@@ -137,6 +225,8 @@ function advanceSlideshow(){
 	}
 	setTimeout(advanceSlideshow,5000);
 }
+*/
+
 
 //start the program by polling the server and running the slideshow
 //these functions will trigger and endless cycle of repolling and slide updates

@@ -3,19 +3,25 @@ body {
 	background: black;
 }
 
+canvas {
+	position: absolute;
+	z-index: 100;
+}
+
 .mainimage img{
 	height: 100%;
 }
 
 .floatbox {
    position: absolute;
+   z-index: 200;
    top: 25px;
-   left: 60%;
-   width: 40%;
+   right: 25px;
+   width: 36%;
 }
 
 .tweets h2 {
-	color: #A378B4;
+	color: #c398d4;
    font: 24px Helvetica, Sans-Serif;
 }
 
@@ -24,11 +30,12 @@ body {
 	color: white;
    font: 18px Helvetica, Sans-Serif;
    background: rgb(0, 0, 0); /* fallback color */
-   background: rgba(0, 0, 0, 0.7);
+   background: rgba(0, 0, 0, 0.6);
 }
 
 .captionbox {
    position: absolute;
+   z-index: 150;
    bottom: 20px;
    left: 20px;
 }

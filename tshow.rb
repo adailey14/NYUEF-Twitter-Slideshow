@@ -1,4 +1,5 @@
 # tshow.rb
+require 'rubygems'
 require 'json'
 require 'sinatra'
 require 'haml'
