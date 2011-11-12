@@ -111,8 +111,8 @@ function advanceSlideshow() {
 	
 	// max dimensions for images
 	var box = Math.min(window.innerWidth, window.innerHeight);
-	var maxImageWidth = box * .9;
-	var maxImageHeight = box * .9;
+	var maxImageWidth = box * 1.1;
+	var maxImageHeight = box * 1.1;
 	
 	// positioning area
 	var bleed = .1;
